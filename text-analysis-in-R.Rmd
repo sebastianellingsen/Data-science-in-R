@@ -25,46 +25,50 @@ opts_chunk$set(message=FALSE, warning=FALSE)
 
 
 
+
+
+## Introduction
+Text can be stored in a dataframe in R, but it's convinient to use `tidytext` commands for several tasks in analyzing text with R.
+
+These slides will show the most important operations needed to do basic text analysis in R. A key reference and many of the examples come from Silge and Robinson (2017).
+
 # Loading and cleaning data
 
 ## Simple example
 
-Defining a vector of text:
-```{r, echo=TRUE}
-text <- c("Because I could not stop for Death -",
-          "He kindly stopped for me -",
-          "The Carriage held but just Ourselves -",
-          "and Immortality")
-text
+Concider the poem by @Limericking (Twitter),
+```{r, echo=FALSE}
+text <- c("A painting by Banksy was smart;",
+"At auction, it shredded apart.",
+"Now tattered, in pieces,",
+"Its value increases,",
+"For such is the market for art.")
 ```
 
-Storing as a dataframe:
+This can be stored as a dataframe:
 ```{r, echo=TRUE}
 library(dplyr)
-text_df <- data_frame(line = 1:4, text = text)
+text_df <- data_frame(line = 1:5, text = text)
 
+text_df
 ```
+
 
 ## Simple example (cont.)
 
 Want it as a one-token-per-document-per-row format:
 
-```{r, echo=TRUE, results='hide'}
+```{r, echo=TRUE}
 library(tidytext)
 
 tidy_text <- text_df %>%
   unnest_tokens(word, text)
 
+tidy_text
 ```
-
-After using unnest_tokens, we’ve split each row so that there is one token (word) in each row of the new data frame.
-
-
 
 
 ## Another example
-
-
 
 ```{r, echo=TRUE, results='hide'}
 
@@ -619,9 +623,9 @@ Convert to tidy dataframe, then remove numbers, remove stop words, lastly we ste
 
 ```
 
+Note: we can plot wordclouds without using the 
 
-
-We need the data as a document term matrisx in order to use learning algorithms.
+We need the data as a document term matrix in order to use learning algorithms.
 ```{r, echo=TRUE, results='hide'}
 
 (congress_dtm <- congress_tokens %>%
@@ -700,6 +704,8 @@ We are now interested in predicting the category using the most common words.
                            trControl = trainControl(method = "oob"))
 ```
 
+
+
 ```{r, echo=TRUE, results='hide'}
 
 library(randomForest)
@@ -732,7 +738,7 @@ Best practice in many cases is to begin analysis by focusing on single words. Gi
 
 hva er strukturen? 
 fjerne ord som dukker opp hele tiden, fa en matrix som er mindre sparse. 
-sa lag en wordcloud
+sa lag en wordcloud 
 
 
 If instead there is a highly
