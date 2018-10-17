@@ -52,7 +52,7 @@ text_df <- data_frame(line = 1:5, text = text)
 
 text_df
 ```
-
+ 
 
 ## Simple example (cont.)
 
