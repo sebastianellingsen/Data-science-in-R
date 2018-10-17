@@ -25,24 +25,28 @@ opts_chunk$set(message=FALSE, warning=FALSE)
 
 
 
-
-
 ## Introduction
 Text can be stored in a dataframe in R, but it's convinient to use `tidytext` commands for several tasks in analyzing text with R.
 
+Especially for descriptive purposes and data exploration, these tools are very useful and easy to use.
+
 These slides will show the most important operations needed to do basic text analysis in R. A key reference and many of the examples come from Silge and Robinson (2017).
+
+First, let's run through a few introductory examples.
 
 # Loading and cleaning data
 
 ## Simple example
 
 Concider the poem by @Limericking (Twitter),
-```{r, echo=FALSE}
+```{r, echo=TRUE}
 text <- c("A painting by Banksy was smart;",
 "At auction, it shredded apart.",
 "Now tattered, in pieces,",
 "Its value increases,",
 "For such is the market for art.")
+
+
 ```
 
 This can be stored as a dataframe:
@@ -56,7 +60,7 @@ text_df
 
 ## Simple example (cont.)
 
-Want it as a one-token-per-document-per-row format:
+We wwant it as a one-token-per-document-per-row format. This is achieved with the unnest_tokens command.
 
 ```{r, echo=TRUE}
 library(tidytext)
@@ -68,7 +72,18 @@ tidy_text
 ```
 
 
+
+## Simple example (cont.)
+
+Many tools in the tidytext package can be used directly on the textfile when it is stored in the tidy format. Especially for descriptive purposes it's very useful.
+
+However, there are many words that are not very informative about the content. These are stop words and we will see how to remove them in the following example. 
+
+
 ## Another example
+
+Tidytext has several buil in books to work with. Let's have a look at the Jane Austen novels. The code below loads the data and unnests the data as a tidy dataset. 
+
 
 ```{r, echo=TRUE, results='hide'}
 
@@ -83,22 +98,19 @@ original_books <- austen_books() %>%
                                                  ignore_case = TRUE)))) %>%
   ungroup()
 
-
-
-```
-
-
-## Another example (cont.)
-
-```{r, echo=TRUE, results='hide'}
-library(tidytext)
+# Unnesting the data
 tidy_books <- original_books %>%
   unnest_tokens(word, text)
 
 tidy_books
+
+
 ```
 
-`tidy_books` now gives a tidy dataset of the books. The next step is to remove stop words:
+
+## Example continued
+
+Note that the most common words in the books are stop words. We can easily remove these by using anti_join from the tidyverse package. `tidy_books` now gives a tidy dataset of the books. The next step is to remove stop words:
 
 ```{r, echo=TRUE, results='hide'}
 data(stop_words)
@@ -110,7 +122,6 @@ tidy_books <- tidy_books %>%
 
 
 The `stop_words` dataset in the tidytext package contains stop words from three lexicons. 
-
 
 
 ## Another example (cont.)
@@ -130,13 +141,9 @@ tidy_books %>%
 ```
 
 
-
-
-
 ## Last example
 
 Let’s get The Time Machine, The War of the Worlds, The Invisible Man, and The Island of Doctor Moreau from the Gutenberg project.
-
 
 ```{r, echo=TRUE, results='hide'}
 
@@ -214,7 +221,22 @@ ggplot(frequency, aes(x = proportion, y = `Jane Austen`, color = abs(`Jane Auste
 
 
 
+
+
+
 # Sentiment analysis
+
+
+## Sentiment analysis
+
+Often researcher are interested in finding features of text such as the sentiment, but they are constrained in some way.
+
+Here we cover dictionary based sentiment analysis which is the most straight forward way of doing sentiment analysis. 
+
+The idea is to exploit hand coded collections of words that are termed positive/negative and look how often these occur in a given document. 
+
+This can easily be done in a tidyverse setting using dictionaries as well as join operations.
+
 
 
 ## Dictionaries
