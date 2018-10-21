@@ -396,9 +396,6 @@ ggplot(book_words, aes(n/total, fill = book)) +
 
 # n-grams
 
-
-
-
 ## Bigrams
 ```{r, echo=TRUE, results='hide'}
 
@@ -473,9 +470,107 @@ Note: the larger the n-gram the more sparse your data will become. Usually bette
 
 
 
-
-
 # Other text formats
+
+
+## Other text formats
+
+Most methods used when doing text analysis are not suitable to run on the token format. 
+
+Usually, to input text data into functions and algorithms one needs to store the texts as a corpus.
+
+Here we'll have a look at how you can store, pre-process and use this format for various text mining tasks.
+
+
+
+## Loading data
+
+
+Going from a vector to a corpus.
+```{r, echo=TRUE, results='hide'}
+library(tm)
+
+data(USCongress, package = "RTextTools") 
+uscongress <- USCongress$text
+
+uscongress_source <- VectorSource(USCongress)
+uscongress_corpus <-VCorpus(uscongress_source)
+
+```
+
+Let's print the 7th text in the corpus.
+```{r, echo=TRUE, results='hide'}
+
+content(uscongress_corpus[[7]])
+
+```
+
+
+Going from a dataframe to a corpus. This is more tedious.
+
+Column one must be called doc_id and contain a unique string for each row. Column two must be called text with "UTF-8" encoding (pretty standard). Any other columns, 3+ are considered metadata and will be retained as such.
+
+So the transformation will only work if we rename the variables.
+
+```{r, echo=TRUE, results='hide'}
+data(USCongress, package = "RTextTools") 
+
+USCongress <- USCongress %>%
+  select(ID, text, major) %>% 
+  rename(doc_id = ID)
+  
+df_source<-DataframeSource(USCongress)
+uscongress_corpus<-VCorpus(df_source)
+
+meta(uscongress_corpus)
+
+
+```
+
+We see that the metadata is what we, down the line are interested in predicting.
+
+
+## Common cleaning functions from tm
+
+There are a bunch of common cleaning functions that are built into the *tm* package.
+
+This is very useful because it simplifies the data substantially. Depending on the task at hand, several different ways of cleaning data can be attempted.
+
+Let's continue working with the corpus of US congress bills we loaded from the dataframe in the previous example.
+
+The tm package provides a function *tm_map()* to apply cleaning functions to an entire corpus, making the cleaning steps easier.
+
+
+
+```{r, echo=TRUE, results='hide'}
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ## Loading the `AssociatedPress` package
 
@@ -594,7 +689,6 @@ ap_documents
 
 ## Text analysis: supervised classification
 
-
 # Initialization
 
 
@@ -622,9 +716,6 @@ data(USCongress, package = "RTextTools")
 
 
 ```
-
-
-
 
 
 
