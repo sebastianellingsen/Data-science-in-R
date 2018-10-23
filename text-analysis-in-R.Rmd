@@ -489,6 +489,7 @@ Here we'll have a look at how you can store, pre-process and use this format for
 Going from a vector to a corpus.
 ```{r, echo=TRUE, results='hide'}
 library(tm)
+library(tidyverse)
 
 data(USCongress, package = "RTextTools") 
 uscongress <- USCongress$text
@@ -541,16 +542,71 @@ Let's continue working with the corpus of US congress bills we loaded from the d
 The tm package provides a function *tm_map()* to apply cleaning functions to an entire corpus, making the cleaning steps easier.
 
 
+## Common cleaning functions from tm
+
+Let's build a function that cleans the corpus and run it on the USCongress corpus.
 
 ```{r, echo=TRUE, results='hide'}
 
+# Alter the function code to match the instructions
+clean_corpus <- function(corpus) {
+  # Remove punctuation
+  corpus <- tm_map(corpus, removePunctuation)
+  # Transform to lower case
+  corpus <- tm_map(corpus, content_transformer(tolower))
+  # Add more stopwords
+  corpus <- tm_map(corpus, removeWords, c(stopwords("en")))
+  # Strip whitespace
+  corpus <- tm_map(corpus, stripWhitespace)
+  return(corpus)
+}
+
+clean_corpus <- clean_corpus(uscongress_corpus)
 
 ```
 
 
+It's possible to add words to the list of stopwords to customize it to a given application.
+
+The USCongress corpus usually has words like "mr speaker", "madam", "gentleman" etc. Let's remove them since provide very little predictive power.
+
+```{r, echo=TRUE, results='hide'}
+
+corpus <- tm_map(corpus, removeWords, c(stopwords("en"), "mr speaker", "madam", "gentleman"))
+
+```
 
 
+Many operations require document term or term document matrices as inputs. Let's see how they can be reshaped.
 
+We can also reshape the document term matrix as a matrix to inspect it. However, it takes a lot of memory.
+
+
+```{r, echo=TRUE, results='hide'}
+
+coffee_dtm<-DocumentTermMatrix(clean_corpus)
+
+coffee_m<-as.matrix(coffee_dtm)
+
+dim(coffee_m)
+
+```
+
+By inspecting it we can see that the matrix has a high dimension and is very sparse.
+
+Let's look at a term document matrix.
+
+```{r, echo=TRUE, results='hide'}
+
+coffee_dtm<-TermDocumentMatrix(clean_corpus)
+
+coffee_m<-as.matrix(coffee_dtm)
+
+dim(coffee_m)
+
+```
+
+We see it's the same matrix just inverted. Different algorithms work with DTM or TDM as inputs.
 
 
 
