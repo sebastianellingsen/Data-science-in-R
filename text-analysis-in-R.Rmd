@@ -543,7 +543,7 @@ The tm package provides a function *tm_map()* to apply cleaning functions to an 
 
 
 ## Common cleaning functions from tm
- 
+
 Let's build a function that cleans the corpus and run it on the USCongress corpus.
 
 ```{r, echo=TRUE, results='hide'}
