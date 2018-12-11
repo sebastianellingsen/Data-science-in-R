@@ -28,7 +28,9 @@ opts_chunk$set(message=FALSE, warning=FALSE)
 ## Introduction
 Text can be stored in a dataframe in R, but it's convinient to use `tidytext` commands for several tasks in analyzing text with R.
 
-Especially for descriptive purposes and data exploration, these tools are very useful and easy to use.
+Especially for descriptive purposes and data exploration, the `tidytext` framework is very useful.
+
+A more common datastructure for handling text is the document term matrix (dtm) or the term document matrix (tdm). 
 
 These slides will show the most important operations needed to do basic text analysis in R. A key reference and many of the examples come from Silge and Robinson (2017).
 
@@ -60,7 +62,7 @@ text_df
 
 ## Simple example (cont.)
 
-We wwant it as a one-token-per-document-per-row format. This is achieved with the unnest_tokens command.
+We want it as a one-token-per-document-per-row format. This is achieved with the unnest_tokens command.
 
 ```{r, echo=TRUE}
 library(tidytext)
@@ -224,401 +226,401 @@ ggplot(frequency, aes(x = proportion, y = `Jane Austen`, color = abs(`Jane Auste
 
 
 
-# Sentiment analysis
+<!-- # Sentiment analysis -->
 
 
-## Sentiment analysis
+<!-- ## Sentiment analysis -->
 
-Often researcher are interested in finding features of text such as the sentiment, but they are constrained in some way.
+<!-- Often researcher are interested in finding features of text such as the sentiment, but they are constrained in some way. -->
 
-Here we cover dictionary based sentiment analysis which is the most straight forward way of doing sentiment analysis. 
+<!-- Here we cover dictionary based sentiment analysis which is the most straight forward way of doing sentiment analysis. -->
 
-The idea is to exploit hand coded collections of words that are termed positive/negative and look how often these occur in a given document. 
+<!-- The idea is to exploit hand coded collections of words that are termed positive/negative and look how often these occur in a given document. -->
 
-This can easily be done in a tidyverse setting using dictionaries as well as join operations.
+<!-- This can easily be done in a tidyverse setting using dictionaries as well as join operations. -->
 
 
 
-## Dictionaries
+<!-- ## Dictionaries -->
 
-```{r, echo=TRUE, results='hide'}
+<!-- ```{r, echo=TRUE, results='hide'} -->
 
-library(tidytext)
+<!-- library(tidytext) -->
 
-sentiments
+<!-- sentiments -->
 
-get_sentiments("afinn")
-get_sentiments("bing")
-get_sentiments("nrc")
+<!-- get_sentiments("afinn") -->
+<!-- get_sentiments("bing") -->
+<!-- get_sentiments("nrc") -->
 
-```
+<!-- ``` -->
 
 
 
-## Sentiment analysis - Example
+<!-- ## Sentiment analysis - Example -->
 
-```{r, echo=TRUE, results='hide'}
-library(janeaustenr)
-library(dplyr)
-library(stringr)
+<!-- ```{r, echo=TRUE, results='hide'} -->
+<!-- library(janeaustenr) -->
+<!-- library(dplyr) -->
+<!-- library(stringr) -->
 
-tidy_books <- austen_books() %>%
-  group_by(book) %>%
-  mutate(linenumber = row_number(),
-         chapter = cumsum(str_detect(text, regex("^chapter [\\divxlc]", 
-                                                 ignore_case = TRUE)))) %>%
-  ungroup() %>%
-  unnest_tokens(word, text)
+<!-- tidy_books <- austen_books() %>% -->
+<!--   group_by(book) %>% -->
+<!--   mutate(linenumber = row_number(), -->
+<!--          chapter = cumsum(str_detect(text, regex("^chapter [\\divxlc]", -->
+<!--                                                  ignore_case = TRUE)))) %>% -->
+<!--   ungroup() %>% -->
+<!--   unnest_tokens(word, text) -->
 
 
-```
+<!-- ``` -->
 
 
-## How many words are associated with joy?
-```{r, echo=TRUE, results='hide'}
+<!-- ## How many words are associated with joy? -->
+<!-- ```{r, echo=TRUE, results='hide'} -->
 
-nrc_joy <- get_sentiments("nrc") %>% 
-  filter(sentiment == "joy")
+<!-- nrc_joy <- get_sentiments("nrc") %>% -->
+<!--   filter(sentiment == "joy") -->
 
-tidy_books %>%
-  filter(book == "Emma") %>%
-  inner_join(nrc_joy) %>%
-  count(word, sort = TRUE)
+<!-- tidy_books %>% -->
+<!--   filter(book == "Emma") %>% -->
+<!--   inner_join(nrc_joy) %>% -->
+<!--   count(word, sort = TRUE) -->
 
-```
+<!-- ``` -->
 
 
 
-## How does the sentiment change throughout the novel?
-```{r, echo=TRUE, results='hide'}
+<!-- ## How does the sentiment change throughout the novel? -->
+<!-- ```{r, echo=TRUE, results='hide'} -->
 
-library(tidyr)
+<!-- library(tidyr) -->
 
-jane_austen_sentiment <- tidy_books %>%
-  inner_join(get_sentiments("bing")) %>%
-  count(book, index = linenumber %/% 80, sentiment) %>%
-  spread(sentiment, n, fill = 0) %>%
-  mutate(sentiment = positive - negative)
+<!-- jane_austen_sentiment <- tidy_books %>% -->
+<!--   inner_join(get_sentiments("bing")) %>% -->
+<!--   count(book, index = linenumber %/% 80, sentiment) %>% -->
+<!--   spread(sentiment, n, fill = 0) %>% -->
+<!--   mutate(sentiment = positive - negative) -->
 
-```
+<!-- ``` -->
 
 
-## Making a wordcloud of words in Sense & Sensibility
-```{r, echo=TRUE, results='hide'}
-tidy_books <- austen_books() %>%
-  group_by(book) %>%
-  filter(book=="Sense & Sensibility") %>%
-  mutate(linenumber = row_number(),
-         chapter = cumsum(str_detect(text, regex("^chapter [\\divxlc]", 
-                                                 ignore_case = TRUE)))) %>%
-  ungroup() %>%
-  unnest_tokens(word, text)
+<!-- ## Making a wordcloud of words in Sense & Sensibility -->
+<!-- ```{r, echo=TRUE, results='hide'} -->
+<!-- tidy_books <- austen_books() %>% -->
+<!--   group_by(book) %>% -->
+<!--   filter(book=="Sense & Sensibility") %>% -->
+<!--   mutate(linenumber = row_number(), -->
+<!--          chapter = cumsum(str_detect(text, regex("^chapter [\\divxlc]", -->
+<!--                                                  ignore_case = TRUE)))) %>% -->
+<!--   ungroup() %>% -->
+<!--   unnest_tokens(word, text) -->
 
 
-```
+<!-- ``` -->
 
 
-## Making a wordcloud
-```{r, echo=FALSE, results='hide'}
-library(wordcloud)
+<!-- ## Making a wordcloud -->
+<!-- ```{r, echo=FALSE, results='hide'} -->
+<!-- library(wordcloud) -->
 
-tidy_books %>%
-  count(word) %>%
-  with(wordcloud(word, n, max.words = 100))
+<!-- tidy_books %>% -->
+<!--   count(word) %>% -->
+<!--   with(wordcloud(word, n, max.words = 100)) -->
 
 
-```
+<!-- ``` -->
 
 
-## Removing stop words
-```{r, echo=FALSE, results='hide'}
-library(wordcloud)
+<!-- ## Removing stop words -->
+<!-- ```{r, echo=FALSE, results='hide'} -->
+<!-- library(wordcloud) -->
 
-tidy_books %>%
-  anti_join(stop_words) %>%
-  count(word) %>%
-  with(wordcloud(word, n, max.words = 100))
+<!-- tidy_books %>% -->
+<!--   anti_join(stop_words) %>% -->
+<!--   count(word) %>% -->
+<!--   with(wordcloud(word, n, max.words = 100)) -->
 
 
-```
+<!-- ``` -->
 
 
 
 
 
-# Analysing term frequency
+<!-- # Analysing term frequency -->
 
 
-This code sums up total words and frequency of each word by book and then joins the two.
-```{r, echo=TRUE, results='hide'}
+<!-- This code sums up total words and frequency of each word by book and then joins the two. -->
+<!-- ```{r, echo=TRUE, results='hide'} -->
 
-library(dplyr)
-library(janeaustenr)
-library(tidytext)
+<!-- library(dplyr) -->
+<!-- library(janeaustenr) -->
+<!-- library(tidytext) -->
 
-book_words <- austen_books() %>%
-  unnest_tokens(word, text) %>%
-  count(book, word, sort = TRUE) %>%
-  ungroup()
+<!-- book_words <- austen_books() %>% -->
+<!--   unnest_tokens(word, text) %>% -->
+<!--   count(book, word, sort = TRUE) %>% -->
+<!--   ungroup() -->
 
-total_words <- book_words %>% 
-  group_by(book) %>% 
-  summarize(total = sum(n))
+<!-- total_words <- book_words %>% -->
+<!--   group_by(book) %>% -->
+<!--   summarize(total = sum(n)) -->
 
-book_words <- left_join(book_words, total_words)
+<!-- book_words <- left_join(book_words, total_words) -->
 
-book_words
+<!-- book_words -->
 
-```
+<!-- ``` -->
 
 
 
 
 
 
-# Analysing term frequency
+<!-- # Analysing term frequency -->
 
 
-```{r, echo=TRUE, results='hide'}
+<!-- ```{r, echo=TRUE, results='hide'} -->
 
-library(ggplot2)
+<!-- library(ggplot2) -->
 
-ggplot(book_words, aes(n/total, fill = book)) +
-  geom_histogram(show.legend = FALSE) +
-  xlim(NA, 0.0009) +
-  facet_wrap(~book, ncol = 2, scales = "free_y") + theme_void()
+<!-- ggplot(book_words, aes(n/total, fill = book)) + -->
+<!--   geom_histogram(show.legend = FALSE) + -->
+<!--   xlim(NA, 0.0009) + -->
+<!--   facet_wrap(~book, ncol = 2, scales = "free_y") + theme_void() -->
 
-```
+<!-- ``` -->
 
 
 
 
 
-# n-grams
+<!-- # n-grams -->
 
-## Bigrams
-```{r, echo=TRUE, results='hide'}
+<!-- ## Bigrams -->
+<!-- ```{r, echo=TRUE, results='hide'} -->
 
-library(dplyr)
-library(tidytext)
-library(janeaustenr)
+<!-- library(dplyr) -->
+<!-- library(tidytext) -->
+<!-- library(janeaustenr) -->
 
-austen_bigrams <- austen_books() %>%
-  unnest_tokens(bigram, text, token = "ngrams", n = 2)
+<!-- austen_bigrams <- austen_books() %>% -->
+<!--   unnest_tokens(bigram, text, token = "ngrams", n = 2) -->
 
-austen_bigrams
+<!-- austen_bigrams -->
 
 
-```
+<!-- ``` -->
 
 
 
-```{r, echo=TRUE, results='hide'}
+<!-- ```{r, echo=TRUE, results='hide'} -->
 
-austen_bigrams %>%
-  count(bigram, sort = TRUE)
+<!-- austen_bigrams %>% -->
+<!--   count(bigram, sort = TRUE) -->
 
-```
+<!-- ``` -->
 
 
 
-## Remove cases where either is a stopword
-```{r, echo=TRUE, results='hide'}
+<!-- ## Remove cases where either is a stopword -->
+<!-- ```{r, echo=TRUE, results='hide'} -->
 
-library(tidyr)
+<!-- library(tidyr) -->
 
-bigrams_separated <- austen_bigrams %>%
-  separate(bigram, c("word1", "word2"), sep = " ")
+<!-- bigrams_separated <- austen_bigrams %>% -->
+<!--   separate(bigram, c("word1", "word2"), sep = " ") -->
 
-bigrams_filtered <- bigrams_separated %>%
-  filter(!word1 %in% stop_words$word) %>%
-  filter(!word2 %in% stop_words$word)
+<!-- bigrams_filtered <- bigrams_separated %>% -->
+<!--   filter(!word1 %in% stop_words$word) %>% -->
+<!--   filter(!word2 %in% stop_words$word) -->
 
-# new bigram counts:
-bigram_counts <- bigrams_filtered %>% 
-  count(word1, word2, sort = TRUE)
+<!-- # new bigram counts: -->
+<!-- bigram_counts <- bigrams_filtered %>% -->
+<!--   count(word1, word2, sort = TRUE) -->
 
-bigram_counts
-```
+<!-- bigram_counts -->
+<!-- ``` -->
 
 
-We can reunite the bigrams after having removed the stopwords:
+<!-- We can reunite the bigrams after having removed the stopwords: -->
 
-```{r, echo=TRUE, results='hide'}
+<!-- ```{r, echo=TRUE, results='hide'} -->
 
-bigrams_united <- bigrams_filtered %>%
-  unite(bigram, word1, word2, sep = " ")
+<!-- bigrams_united <- bigrams_filtered %>% -->
+<!--   unite(bigram, word1, word2, sep = " ") -->
 
-bigrams_united
-```
+<!-- bigrams_united -->
+<!-- ``` -->
 
 
-## We can analyze word frequency using bigrams:
+<!-- ## We can analyze word frequency using bigrams: -->
 
-```{r, echo=TRUE, results='hide'}
+<!-- ```{r, echo=TRUE, results='hide'} -->
 
-bigram_tf_idf <- bigrams_united %>%
-  count(book, bigram) %>%
-  bind_tf_idf(bigram, book, n) %>%
-  arrange(desc(tf_idf))
+<!-- bigram_tf_idf <- bigrams_united %>% -->
+<!--   count(book, bigram) %>% -->
+<!--   bind_tf_idf(bigram, book, n) %>% -->
+<!--   arrange(desc(tf_idf)) -->
 
-bigram_tf_idf
-```
+<!-- bigram_tf_idf -->
+<!-- ``` -->
 
 
-Note: the larger the n-gram the more sparse your data will become. Usually better with large datasets.
+<!-- Note: the larger the n-gram the more sparse your data will become. Usually better with large datasets. -->
 
 
 
-# Other text formats
 
 
-## Other text formats
 
-Most methods used when doing text analysis are not suitable to run on the token format. 
 
-Usually, to input text data into functions and algorithms one needs to store the texts as a corpus.
 
-Here we'll have a look at how you can store, pre-process and use this format for various text mining tasks.
 
 
 
-## Loading data
 
 
-Going from a vector to a corpus.
-```{r, echo=TRUE, results='hide'}
-library(tm)
-library(tidyverse)
+<!-- # Other text formats -->
 
-data(USCongress, package = "RTextTools") 
-uscongress <- USCongress$text
 
-uscongress_source <- VectorSource(USCongress)
-uscongress_corpus <-VCorpus(uscongress_source)
+<!-- ## Other text formats -->
 
-```
+<!-- Most methods used when doing text analysis are not suitable to run on the token format. -->
 
-Let's print the 7th text in the corpus.
-```{r, echo=TRUE, results='hide'}
+<!-- Usually, to input text data into functions and algorithms one needs to store the texts as a corpus. -->
 
-content(uscongress_corpus[[7]])
+<!-- Here we'll have a look at how you can store, pre-process and use this format for various text mining tasks. -->
 
-```
 
 
-Going from a dataframe to a corpus. This is more tedious.
+<!-- ## Loading data -->
 
-Column one must be called doc_id and contain a unique string for each row. Column two must be called text with "UTF-8" encoding (pretty standard). Any other columns, 3+ are considered metadata and will be retained as such.
 
-So the transformation will only work if we rename the variables.
+<!-- Going from a vector to a corpus. -->
+<!-- ```{r, echo=TRUE, results='hide'} -->
+<!-- library(tm) -->
+<!-- library(tidyverse) -->
 
-```{r, echo=TRUE, results='hide'}
-data(USCongress, package = "RTextTools") 
+<!-- data(USCongress, package = "RTextTools") -->
+<!-- uscongress <- USCongress$text -->
 
-USCongress <- USCongress %>%
-  select(ID, text, major) %>% 
-  rename(doc_id = ID)
-  
-df_source<-DataframeSource(USCongress)
-uscongress_corpus<-VCorpus(df_source)
+<!-- uscongress_source <- VectorSource(USCongress) -->
+<!-- uscongress_corpus <-VCorpus(uscongress_source) -->
 
-meta(uscongress_corpus)
+<!-- ``` -->
 
+<!-- Let's print the 7th text in the corpus. -->
+<!-- ```{r, echo=TRUE, results='hide'} -->
 
-```
+<!-- cont <- content(uscongress_corpus[[6]]) -->
 
-We see that the metadata is what we, down the line are interested in predicting.
+<!-- cont[[7]] -->
 
+<!-- ``` -->
 
-## Common cleaning functions from tm
 
-There are a bunch of common cleaning functions that are built into the *tm* package.
+<!-- Going from a dataframe to a corpus. This is more tedious. -->
 
-This is very useful because it simplifies the data substantially. Depending on the task at hand, several different ways of cleaning data can be attempted.
+<!-- Column one must be called doc_id and contain a unique string for each row. Column two must be called text with "UTF-8" encoding (pretty standard). Any other columns, 3+ are considered metadata and will be retained as such. -->
 
-Let's continue working with the corpus of US congress bills we loaded from the dataframe in the previous example.
+<!-- So the transformation will only work if we rename the variables. -->
 
-The tm package provides a function *tm_map()* to apply cleaning functions to an entire corpus, making the cleaning steps easier.
+<!-- ```{r, echo=TRUE, results='hide'} -->
+<!-- data(USCongress, package = "RTextTools") -->
 
+<!-- USCongress <- USCongress %>% -->
+<!--   select(ID, text, major) %>% -->
+<!--   rename(doc_id = ID) -->
 
-## Common cleaning functions from tm
+<!-- df_source<-DataframeSource(USCongress) -->
+<!-- uscongress_corpus<-VCorpus(df_source) -->
 
-Let's build a function that cleans the corpus and run it on the USCongress corpus.
+<!-- meta(uscongress_corpus) -->
 
-```{r, echo=TRUE, results='hide'}
 
-# Alter the function code to match the instructions
-clean_corpus <- function(corpus) {
-  # Remove punctuation
-  corpus <- tm_map(corpus, removePunctuation)
-  # Transform to lower case
-  corpus <- tm_map(corpus, content_transformer(tolower))
-  # Add more stopwords
-  corpus <- tm_map(corpus, removeWords, c(stopwords("en")))
-  # Strip whitespace
-  corpus <- tm_map(corpus, stripWhitespace)
-  return(corpus)
-}
+<!-- ``` -->
 
-clean_corpus <- clean_corpus(uscongress_corpus)
+<!-- We see that the metadata is what we, down the line are interested in predicting. -->
 
-```
 
+<!-- ## Common cleaning functions from tm -->
 
-It's possible to add words to the list of stopwords to customize it to a given application.
+<!-- There are a bunch of common cleaning functions that are built into the *tm* package. -->
 
-The USCongress corpus usually has words like "mr speaker", "madam", "gentleman" etc. Let's remove them since provide very little predictive power.
+<!-- This is very useful because it simplifies the data substantially. Depending on the task at hand, several different ways of cleaning data can be attempted. -->
 
-```{r, echo=TRUE, results='hide'}
+<!-- Let's continue working with the corpus of US congress bills we loaded from the dataframe in the previous example. -->
 
-corpus <- tm_map(corpus, removeWords, c(stopwords("en"), "mr speaker", "madam", "gentleman"))
+<!-- The tm package provides a function *tm_map()* to apply cleaning functions to an entire corpus, making the cleaning steps easier. -->
 
-```
 
+<!-- ## Common cleaning functions from tm -->
 
-Many operations require document term or term document matrices as inputs. Let's see how they can be reshaped.
+<!-- Let's build a function that cleans the corpus and run it on the USCongress corpus. -->
 
-We can also reshape the document term matrix as a matrix to inspect it. However, it takes a lot of memory.
+<!-- ```{r, echo=TRUE, results='hide'} -->
 
+<!-- # Alter the function code to match the instructions -->
+<!-- clean_corpus <- function(corpus) { -->
+<!--   # Remove punctuation -->
+<!--   corpus <- tm_map(corpus, removePunctuation) -->
+<!--   # Transform to lower case -->
+<!--   corpus <- tm_map(corpus, content_transformer(tolower)) -->
+<!--   # Add more stopwords -->
+<!--   corpus <- tm_map(corpus, removeWords, c(stopwords("en"))) -->
+<!--   # Strip whitespace -->
+<!--   corpus <- tm_map(corpus, stripWhitespace) -->
+<!--   return(corpus) -->
+<!-- } -->
 
-```{r, echo=TRUE, results='hide'}
+<!-- clean_corpus <- clean_corpus(uscongress_corpus) -->
 
-coffee_dtm<-DocumentTermMatrix(clean_corpus)
+<!-- ``` -->
 
-coffee_m<-as.matrix(coffee_dtm)
 
-dim(coffee_m)
+<!-- It's possible to add words to the list of stopwords to customize it to a given application. -->
 
-```
+<!-- The USCongress corpus usually has words like "mr speaker", "madam", "gentleman" etc. Let's remove them since provide very little predictive power. -->
 
-By inspecting it we can see that the matrix has a high dimension and is very sparse.
+<!-- ```{r, echo=TRUE, results='hide'} -->
 
-Let's look at a term document matrix.
+<!-- corpus <- tm_map(corpus, removeWords, c(stopwords("en"), "mr speaker", "madam", "gentleman")) -->
 
-```{r, echo=TRUE, results='hide'}
+<!-- ``` -->
 
-coffee_dtm<-TermDocumentMatrix(clean_corpus)
 
-coffee_m<-as.matrix(coffee_dtm)
+<!-- Many operations require document term or term document matrices as inputs. Let's see how they can be reshaped. -->
 
-dim(coffee_m)
+<!-- We can also reshape the document term matrix as a matrix to inspect it. However, it takes a lot of memory. -->
 
-```
 
-We see it's the same matrix just inverted. Different algorithms work with DTM or TDM as inputs.
+<!-- ```{r, echo=TRUE, results='hide'} -->
 
+<!-- coffee_dtm<-DocumentTermMatrix(clean_corpus) -->
 
+<!-- coffee_m<-as.matrix(coffee_dtm) -->
 
+<!-- dim(coffee_m) -->
 
+<!-- ``` -->
 
+<!-- By inspecting it we can see that the matrix has a high dimension and is very sparse. -->
 
+<!-- Let's look at a term document matrix. -->
 
+<!-- ```{r, echo=TRUE, results='hide'} -->
 
+<!-- coffee_dtm<-TermDocumentMatrix(clean_corpus) -->
 
+<!-- coffee_m<-as.matrix(coffee_dtm) -->
 
+<!-- dim(coffee_m) -->
 
+<!-- ``` -->
 
+<!-- We see it's the same matrix just inverted. Different algorithms work with DTM or TDM as inputs. -->
 
 
 
@@ -628,304 +630,331 @@ We see it's the same matrix just inverted. Different algorithms work with DTM or
 
 
 
-## Loading the `AssociatedPress` package
 
 
-```{r, echo=TRUE, results='hide'}
-library(tm)
 
-data("AssociatedPress", package = "topicmodels")
-AssociatedPress
-```
 
-We see that this dataset contains 2246 documents (each of them an AP article) and 10473 terms (distinct words). Notice that this DTM is 99% sparse (99% of document-word pairs are zero).
 
 
-## Can be organized as tidy text using `tidy`
 
-```{r, echo=TRUE, results='hide'}
-library(dplyr)
-library(tidytext)
 
-ap_td <- tidy(AssociatedPress)
-ap_td
 
-```
 
 
-## Can be organized as tidy text using `tidy`
 
-```{r, echo=TRUE, results='hide'}
-library(dplyr)
-library(tidytext)
 
-ap_td <- tidy(AssociatedPress)
-ap_td
 
-```
 
 
 
-# Topic modeling
 
 
-## Topic modeling
 
-Start by running the latent drichlet model for the associated press dataset.
 
-```{r, echo=TRUE, results='hide'}
-library(topicmodels)
 
-data("AssociatedPress")
-AssociatedPress
 
-#ap_td <- tidy(AssociatedPress)
 
-ap_td %>%
-  cast_dtm(document, term, count)
 
 
-```
 
+<!-- ## Loading the `AssociatedPress` package -->
 
-```{r, echo=TRUE, results='hide'}
-ap_lda <- LDA(AssociatedPress, k = 2, control = list(seed = 1234))
-ap_lda
-```
 
+<!-- ```{r, echo=TRUE, results='hide'} -->
+<!-- library(tm) -->
 
-## Topic modeling
+<!-- data("AssociatedPress", package = "topicmodels") -->
+<!-- AssociatedPress -->
+<!-- ``` -->
 
+<!-- We see that this dataset contains 2246 documents (each of them an AP article) and 10473 terms (distinct words). Notice that this DTM is 99% sparse (99% of document-word pairs are zero). -->
 
-The results can be tidied in order to use tidy tools.
-```{r, echo=TRUE, results='hide'}
-library(tidytext)
 
-ap_topics <- tidy(ap_lda, matrix = "beta")
-ap_topics
-```
+<!-- ## Can be organized as tidy text using `tidy` -->
 
+<!-- ```{r, echo=TRUE, results='hide'} -->
+<!-- library(dplyr) -->
+<!-- library(tidytext) -->
 
+<!-- ap_td <- tidy(AssociatedPress) -->
+<!-- ap_td -->
 
-# Visualizing the results
+<!-- ``` -->
 
-The two categories seem to be about politics and the economy.
-```{r, echo=TRUE, results='hide'}
-library(ggplot2)
-library(dplyr)
 
-ap_top_terms <- ap_topics %>%
-  group_by(topic) %>%
-  top_n(10, beta) %>%
-  ungroup() %>%
-  arrange(topic, -beta)
+<!-- ## Can be organized as tidy text using `tidy` -->
 
-ap_top_terms %>%
-  mutate(term = reorder(term, beta)) %>%
-  ggplot(aes(term, beta, fill = factor(topic))) +
-  geom_col(show.legend = FALSE) +
-  facet_wrap(~ topic, scales = "free") +
-  coord_flip()
+<!-- ```{r, echo=TRUE, results='hide'} -->
+<!-- library(dplyr) -->
+<!-- library(tidytext) -->
 
-```
+<!-- ap_td <- tidy(AssociatedPress) -->
+<!-- ap_td -->
 
+<!-- ``` -->
 
 
-# Document topic probabilities
 
+<!-- # Topic modeling -->
 
-```{r, echo=TRUE, results='hide'}
 
-ap_documents <- tidy(ap_lda, matrix = "gamma")
-ap_documents
+<!-- ## Topic modeling -->
 
+<!-- Start by running the latent drichlet model for the associated press dataset. -->
 
-```
+<!-- ```{r, echo=TRUE, results='hide'} -->
+<!-- library(topicmodels) -->
 
+<!-- data("AssociatedPress") -->
+<!-- AssociatedPress -->
 
-## Text analysis: supervised classification
+<!-- #ap_td <- tidy(AssociatedPress) -->
 
-# Initialization
+<!-- ap_td %>% -->
+<!--   cast_dtm(document, term, count) -->
 
 
-```{r, echo=TRUE, results='hide'}
+<!-- ``` -->
 
-library(tidyverse)
-library(tidytext)
-library(stringr)
-library(caret)
-library(tm)
 
-set.seed(1234)
-theme_set(theme_minimal())
+<!-- ```{r, echo=TRUE, results='hide'} -->
+<!-- ap_lda <- LDA(AssociatedPress, k = 2, control = list(seed = 1234)) -->
+<!-- ap_lda -->
+<!-- ``` -->
 
 
-```
+<!-- ## Topic modeling -->
 
 
-```{r, echo=TRUE, results='hide'}
+<!-- The results can be tidied in order to use tidy tools. -->
+<!-- ```{r, echo=TRUE, results='hide'} -->
+<!-- library(tidytext) -->
 
-data(USCongress, package = "RTextTools")
+<!-- ap_topics <- tidy(ap_lda, matrix = "beta") -->
+<!-- ap_topics -->
+<!-- ``` -->
 
-(congress <- as_tibble(USCongress) %>%
-    mutate(text = as.character(text)))
 
 
-```
+<!-- # Visualizing the results -->
 
+<!-- The two categories seem to be about politics and the economy. -->
+<!-- ```{r, echo=TRUE, results='hide'} -->
+<!-- library(ggplot2) -->
+<!-- library(dplyr) -->
 
+<!-- ap_top_terms <- ap_topics %>% -->
+<!--   group_by(topic) %>% -->
+<!--   top_n(10, beta) %>% -->
+<!--   ungroup() %>% -->
+<!--   arrange(topic, -beta) -->
 
+<!-- ap_top_terms %>% -->
+<!--   mutate(term = reorder(term, beta)) %>% -->
+<!--   ggplot(aes(term, beta, fill = factor(topic))) + -->
+<!--   geom_col(show.legend = FALSE) + -->
+<!--   facet_wrap(~ topic, scales = "free") + -->
+<!--   coord_flip() -->
 
-# Reducing model complexity
+<!-- ``` -->
 
-Convert to tidy dataframe, then remove numbers, remove stop words, lastly we stem the dataset.
-```{r, echo=TRUE, results='hide'}
 
-(congress_tokens <- congress %>%
-   unnest_tokens(output = word, input = text) %>%
-   # remove numbers
-   filter(!str_detect(word, "^[0-9]*$")) %>%
-   # remove stop words
-   anti_join(stop_words) %>%
-   # stem the words
-   mutate(word = SnowballC::wordStem(word)))
 
-```
+<!-- # Document topic probabilities -->
 
-Note: we can plot wordclouds without using the 
 
-We need the data as a document term matrix in order to use learning algorithms.
-```{r, echo=TRUE, results='hide'}
+<!-- ```{r, echo=TRUE, results='hide'} -->
 
-(congress_dtm <- congress_tokens %>%
-   # get count of each token in each document
-   count(ID, word) %>%
-   # create a document-term matrix with all features and tf weighting
-   cast_dtm(document = ID, term = word, value = n))
+<!-- ap_documents <- tidy(ap_lda, matrix = "gamma") -->
+<!-- ap_documents -->
 
-congress_dtm <- removeSparseTerms(congress_dtm, sparse = .99)
 
-```
+<!-- ``` -->
 
 
+<!-- ## Text analysis: supervised classification -->
 
+<!-- # Initialization -->
 
-# Exploratory analysis
 
-Tidytext methods are very useful for exploratory analysis. 
+<!-- ```{r, echo=TRUE, results='hide'} -->
 
+<!-- library(tidyverse) -->
+<!-- library(tidytext) -->
+<!-- library(stringr) -->
+<!-- library(caret) -->
+<!-- library(tm) -->
 
-```{r, echo=TRUE, results='hide'}
+<!-- set.seed(1234) -->
+<!-- theme_set(theme_minimal()) -->
 
-congress_tfidf <- congress_tokens %>%
-   count(major, word) %>%
-   bind_tf_idf(word, major, n)
 
+<!-- ``` -->
 
-```
 
+<!-- ```{r, echo=TRUE, results='hide'} -->
 
+<!-- data(USCongress, package = "RTextTools") -->
 
+<!-- (congress <- as_tibble(USCongress) %>% -->
+<!--     mutate(text = as.character(text))) -->
 
-```{r, echo=TRUE, results='hide'}
 
-plot_congress <- congress_tfidf %>%
-  arrange(desc(tf_idf)) %>%
-  mutate(word = factor(word, levels = rev(unique(word))))
+<!-- ``` -->
 
-# graph the top 10 tokens for 4 categories
-plot_congress %>%
-  filter(major %in% c(1, 2, 3, 6)) %>%
-  mutate(major = factor(major, levels = c(1, 2, 3, 6),
-                        labels = c("Macroeconomics", "Civil Rights",
-                                   "Health", "Education"))) %>%
-  group_by(major) %>%
-  top_n(10) %>%
-  ungroup() %>%
-  ggplot(aes(word, tf_idf)) +
-  geom_col() +
-  labs(x = NULL, y = "tf-idf") +
-  facet_wrap(~major, scales = "free") +
-  coord_flip()
 
-```
 
 
+<!-- # Reducing model complexity -->
 
+<!-- Convert to tidy dataframe, then remove numbers, remove stop words, lastly we stem the dataset. -->
+<!-- ```{r, echo=TRUE, results='hide'} -->
 
-We are now interested in predicting the category using the most common words.
+<!-- (congress_tokens <- congress %>% -->
+<!--    unnest_tokens(output = word, input = text) %>% -->
+<!--    # remove numbers -->
+<!--    filter(!str_detect(word, "^[0-9]*$")) %>% -->
+<!--    # remove stop words -->
+<!--    anti_join(stop_words) %>% -->
+<!--    # stem the words -->
+<!--    mutate(word = SnowballC::wordStem(word))) -->
 
-```{r, echo=TRUE, results='hide'}
+<!-- ``` -->
 
-#congress_rf <- train(x = as.matrix(congress_dtm),
-#                     y = factor(congress$major),
-#                     method = "rf",
-#                     ntree = 10,
-#                     trControl = trainControl(method = "oob"))
+<!-- Note: we can plot wordclouds without using the -->
 
-#congress_rf$finalModel
+<!-- We need the data as a document term matrix in order to use learning algorithms. -->
+<!-- ```{r, echo=TRUE, results='hide'} -->
 
+<!-- (congress_dtm <- congress_tokens %>% -->
+<!--    # get count of each token in each document -->
+<!--    count(ID, word) %>% -->
+<!--    # create a document-term matrix with all features and tf weighting -->
+<!--    cast_dtm(document = ID, term = word, value = n)) -->
 
-  congress_rf_2000 <- train(x = as.matrix(congress_dtm),
-                           y = factor(congress$major),
-                           method = "rf",
-                           ntree = 10,
-                           trControl = trainControl(method = "oob"))
-```
+<!-- congress_dtm <- removeSparseTerms(congress_dtm, sparse = .99) -->
 
+<!-- ``` -->
 
 
-```{r, echo=TRUE, results='hide'}
 
-library(randomForest)
-varImpPlot(congress_rf_2000$finalModel)
 
-```
+<!-- # Exploratory analysis -->
 
+<!-- Tidytext methods are very useful for exploratory analysis. -->
 
 
-# notes
-A common practice is to keep only the words within each document i with tf-idf scores above some rank or cutoff.
+<!-- ```{r, echo=TRUE, results='hide'} -->
 
+<!-- congress_tfidf <- congress_tokens %>% -->
+<!--    count(major, word) %>% -->
+<!--    bind_tf_idf(word, major, n) -->
 
-final step that is commonly used to reduce the feature space is stemming:
 
+<!-- ``` -->
 
-remove words with lower than ... itdf score
 
 
 
-all these tricks reduce the dimensionality of the data and makes it less computationally costly to conduct prediction.
+<!-- ```{r, echo=TRUE, results='hide'} -->
 
+<!-- plot_congress <- congress_tfidf %>% -->
+<!--   arrange(desc(tf_idf)) %>% -->
+<!--   mutate(word = factor(word, levels = rev(unique(word)))) -->
 
-igoring the order of words is sometimes called the bag of words approach
+<!-- # graph the top 10 tokens for 4 categories -->
+<!-- plot_congress %>% -->
+<!--   filter(major %in% c(1, 2, 3, 6)) %>% -->
+<!--   mutate(major = factor(major, levels = c(1, 2, 3, 6), -->
+<!--                         labels = c("Macroeconomics", "Civil Rights", -->
+<!--                                    "Health", "Education"))) %>% -->
+<!--   group_by(major) %>% -->
+<!--   top_n(10) %>% -->
+<!--   ungroup() %>% -->
+<!--   ggplot(aes(word, tf_idf)) + -->
+<!--   geom_col() + -->
+<!--   labs(x = NULL, y = "tf-idf") + -->
+<!--   facet_wrap(~major, scales = "free") + -->
+<!--   coord_flip() -->
 
+<!-- ``` -->
 
-A phrase of length n is referred to as an n-gram
-costly to use high n-grams
-Best practice in many cases is to begin analysis by focusing on single words. Given the accuracy obtained with words alone, one can then evaluate if it is worth the extra time to move on to 2-grams or 3-grams.
 
-hva er strukturen? 
-fjerne ord som dukker opp hele tiden, fa en matrix som er mindre sparse. 
-sa lag en wordcloud 
 
 
-If instead there is a highly
-non-linear and complex relationship between the features and the response
-as indicated by model (8.9), then decision trees may outperform classical
-approaches.
+<!-- We are now interested in predicting the category using the most common words. -->
 
-idea: groseclose and gentzkow papers, what politicians do the newspapers sound more like?
-predict party affiliation using speech, then compare predictive terms to newspapers
+<!-- ```{r, echo=TRUE, results='hide'} -->
 
-might be highly non-linear, the feature space is very sparse, outcome is binary, 
-however, it has the flavor of a supervised learning problem because I observe the 
-outcomes in the training set
+<!-- #congress_rf <- train(x = as.matrix(congress_dtm), -->
+<!-- #                     y = factor(congress$major), -->
+<!-- #                     method = "rf", -->
+<!-- #                     ntree = 10, -->
+<!-- #                     trControl = trainControl(method = "oob")) -->
 
-two methods commonly used in this setting, support vector machine and random forrest classification  
+<!-- #congress_rf$finalModel -->
 
-basic algorithm: pre-processing, cross-validation, find predictive words, predict 
-                 party affiliation of newspapers
+
+<!--   congress_rf_2000 <- train(x = as.matrix(congress_dtm), -->
+<!--                            y = factor(congress$major), -->
+<!--                            method = "rf", -->
+<!--                            ntree = 10, -->
+<!--                            trControl = trainControl(method = "oob")) -->
+<!-- ``` -->
+
+
+
+<!-- ```{r, echo=TRUE, results='hide'} -->
+
+<!-- library(randomForest) -->
+<!-- varImpPlot(congress_rf_2000$finalModel) -->
+
+<!-- ``` -->
+
+
+
+<!-- # notes -->
+<!-- A common practice is to keep only the words within each document i with tf-idf scores above some rank or cutoff. -->
+
+
+<!-- final step that is commonly used to reduce the feature space is stemming: -->
+
+
+<!-- remove words with lower than ... itdf score -->
+
+
+
+<!-- all these tricks reduce the dimensionality of the data and makes it less computationally costly to conduct prediction. -->
+
+
+<!-- igoring the order of words is sometimes called the bag of words approach -->
+
+
+<!-- A phrase of length n is referred to as an n-gram -->
+<!-- costly to use high n-grams -->
+<!-- Best practice in many cases is to begin analysis by focusing on single words. Given the accuracy obtained with words alone, one can then evaluate if it is worth the extra time to move on to 2-grams or 3-grams. -->
+
+<!-- hva er strukturen? -->
+<!-- fjerne ord som dukker opp hele tiden, fa en matrix som er mindre sparse. -->
+<!-- sa lag en wordcloud -->
+
+
+<!-- If instead there is a highly -->
+<!-- non-linear and complex relationship between the features and the response -->
+<!-- as indicated by model (8.9), then decision trees may outperform classical -->
+<!-- approaches. -->
+
+<!-- idea: groseclose and gentzkow papers, what politicians do the newspapers sound more like? -->
+<!-- predict party affiliation using speech, then compare predictive terms to newspapers -->
+
+<!-- might be highly non-linear, the feature space is very sparse, outcome is binary, -->
+<!-- however, it has the flavor of a supervised learning problem because I observe the -->
+<!-- outcomes in the training set -->
+
+<!-- two methods commonly used in this setting, support vector machine and random forrest classification -->
+
+<!-- basic algorithm: pre-processing, cross-validation, find predictive words, predict -->
+<!--                  party affiliation of newspapers -->
 
 
 
