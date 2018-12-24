@@ -37,6 +37,14 @@ ggplot(turnout, aes(income)) + geom_density()
 ggplot(turnout) + 
   geom_density(aes(x=educate, colour=as.factor(vote)))
 
+## Binscatter
+
+# Averaging the 
+turnout_binned <- turnout %>% mutate(bin=cut2(educate, g=9)) %>% 
+  group_by(bin) %>% dplyr::summarize(mean_vote=mean(vote), n=n(), sd=sd(vote), na.rm = TRUE)
+
+ggplot(turnout_binned, aes(mean_vote, bin, group=1)) + geom_point(aes(size=n), shape=1) + 
+  geom_smooth(method="lm", se=FALSE) 
 
 ## Linear regression models
 lmodel1 <- lm(data = turnout, formula = vote ~ educate + income)
