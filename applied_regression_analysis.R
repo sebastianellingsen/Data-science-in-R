@@ -111,7 +111,8 @@ lm_fixed <- plm(expend ~ revenue + grants, data = muni_data, index = c("id", "ye
 
 coeftest(lm_fixed, vcov=vcovHC(lm_fixed, type="HC1", cluster="group")) %>% tidy
 
-
+# More about clustering here: 
+# https://stats.stackexchange.com/questions/10017/standard-error-clustering-in-r-either-manually-or-in-plm/60262
 
 
 
