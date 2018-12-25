@@ -15,7 +15,7 @@ summary(turnout)
 
 # Stargazer provides a more "Stata" way to summarize the dataframe 
 turnout %>% as.data.frame %>% stargazer(type="text")
-
+ 
 # Reporting frequecies
 table(turnout$vote)
 
