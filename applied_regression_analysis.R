@@ -5,7 +5,7 @@ library(stargazer)
 ## Loading and preparing data
 turnout <- read_csv("turnout.csv") %>% select(-X1)
 str(turnout, max.level=1)
-  
+
 turnout <- turnout %>% mutate(race=as.factor(race))
 
 ## Summarizing data
