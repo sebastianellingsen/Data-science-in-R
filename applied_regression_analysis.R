@@ -112,7 +112,7 @@ pdim(muni_data)
 lm_pooled <- plm(expend ~ revenue + grants, data = muni_data, index = c("id", "year"), model = "pooling")
 lm_random <- plm(expend ~ revenue + grants, data = muni_data, index = c("id", "year"), model = "random")
 lm_fixed <- plm(expend ~ revenue + grants, data = muni_data, index = c("id", "year"), model = "within")
-lm_first_diff <- plm(expend ~ revenue + grants, data = muni_data, index = c("id", "year"), model = "within")
+lm_first_diff <- plm(expend ~ revenue + grants, data = muni_data, index = c("id", "year"), model = "within", effect = "twoways")
 
 # Finally: clustering at the unit level with FE models
 lm_fixed <- plm(expend ~ revenue + grants, data = muni_data, index = c("id", "year"), model = "within")

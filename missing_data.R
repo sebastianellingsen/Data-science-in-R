@@ -13,3 +13,4 @@ cars %>% as.data.frame %>% stargazer(type="text")
 # Checking for missing data
 any_na(cars)
 any_na(cars$mpg)
+
