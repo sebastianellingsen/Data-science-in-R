@@ -123,5 +123,135 @@ coeftest(lm_fixed, vcov=vcovHC(lm_fixed, type="HC1", cluster="group")) %>% tidy
 # https://stats.stackexchange.com/questions/10017/standard-error-clustering-in-r-either-manually-or-in-plm/60262
 
 
+## Use felm for applied regressions 
 
+
+
+## Example for showing unbiasedness
+# generate a fictious population
+pop <- rnorm(10000, 10, 1)
+
+# sample from the population and estimate the mean
+est1 <- replicate(expr = mean(sample(x = pop, size = 5)), n = 25000)
+
+est2 <- replicate(expr = mean(sample(x = pop, size = 25)), n = 25000)
+
+fo <- replicate(expr = sample(x = pop, size = 5)[1], n = 25000)
+
+
+# plot density estimate Y_1
+plot(density(fo), 
+     col = 'green', 
+     lwd = 2,
+     ylim = c(0, 2),
+     xlab = 'estimates',
+     main = 'Sampling Distributions of Unbiased Estimators')
+
+# add density estimate for the distribution of the sample mean with n=5 to the plot
+lines(density(est1), 
+      col = 'steelblue', 
+      lwd = 2, 
+      bty = 'l')
+
+# add density estimate for the distribution of the sample mean with n=25 to the plot
+lines(density(est2), 
+      col = 'red2', 
+      lwd = 2)
+
+# add a vertical line at the true parameter
+abline(v = 10, lty = 2)
+
+# add N(10,1) density to the plot
+curve(dnorm(x, mean = 10), 
+      lwd = 2,
+      lty = 2,
+      add = T)
+
+# add a legend
+legend("topleft",
+       legend = c("N(10,1)",
+                  expression(Y[1]),
+                  expression(bar(Y) ~ n == 5),
+                  expression(bar(Y) ~ n == 25)
+       ), 
+       lty = c(2, 1, 1, 1), 
+       col = c('black','green', 'steelblue', 'red2'),
+       lwd = 2)
+
+
+
+
+
+
+# plot the standard normal density on the interval [-4,4]
+curve(dnorm(x),
+      xlim = c(-4, 4),
+      main = 'Calculating a p-Value',
+      yaxs = 'i',
+      xlab = 'z',
+      ylab = '',
+      lwd = 2,
+      axes = 'F')
+
+# add x-axis
+axis(1, 
+     at = c(-1.5, 0, 1.5), 
+     padj = 0.75,
+     labels = c(expression(-frac(bar(Y)^"act"~-~bar(mu)[Y,0], sigma[bar(Y)])),
+                0,
+                expression(frac(bar(Y)^"act"~-~bar(mu)[Y,0], sigma[bar(Y)]))))
+
+# shade p-value/2 region in left tail
+polygon(x = c(-6, seq(-6, -1.5, 0.01), -1.5),
+        y = c(0, dnorm(seq(-6, -1.5, 0.01)),0), 
+        col = 'steelblue')
+
+# shade p-value/2 region in right tail
+polygon(x = c(1.5, seq(1.5, 6, 0.01), 6),
+        y = c(0, dnorm(seq(1.5, 6, 0.01)), 0), 
+        col = 'steelblue')
+
+
+
+
+
+# vector of sample sizes
+n <- c(10000, 5000, 2000, 1000, 500)
+
+# sample observations, estimate using 'sd()' and plot the estimated distributions
+sq_y <- replicate(n = 10000, expr = sd(rnorm(n[1], 10, 10)))
+plot(density(sq_y),
+     main = expression('Sampling Distributions of' ~ s[Y]),
+     xlab = expression(s[y]),
+     lwd = 2)
+
+for (i in 2:length(n)) {
+  sq_y <- replicate(n = 10000, expr = sd(rnorm(n[i], 10, 10)))
+  lines(density(sq_y), 
+        col = i, 
+        lwd = 2)
+}
+
+# add a legend
+legend("topleft",
+       legend = c(expression(n == 10000),
+                  expression(n == 5000),
+                  expression(n == 2000),
+                  expression(n == 1000),
+                  expression(n == 500)), 
+       col = 1:5,
+       lwd = 2)
+
+
+
+## Hypothesis testing 
+
+# set seed
+set.seed(1)
+
+# generate some sample data
+sampledata <- rnorm(100, 10, 10)
+
+# check the type of the outcome produced by t.test
+t.test(sampledata)
 
