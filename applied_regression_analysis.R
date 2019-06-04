@@ -318,6 +318,76 @@ plot(example4, col = 'steelblue', pch = 20, xlab = 'X', ylab = 'Y',
 
 
 
+# 
+# 
+# The following packages are needed for reproducing the code presented in this chapter:
+#   
+#   AER - accompanies the Book Applied Econometrics with R Kleiber & Zeileis (2008) and provides useful functions and data sets.
+# 
+# MASS - a collection of functions for applied statistics.
+# 
+# Make sure these are installed before you go ahead and try to replicate the examples. The safest way to do so is by checking whether the following code chunk executes without any errors.
+
+library(AER)
+library(MASS)
+data(CASchools)
+
+
+
+## Manually calculating the ols coefficients
+
+attach(CASchools) # allows to use the variables contained in CASchools directly
+
+# compute beta_1_hat
+beta_1 <- sum((CASchools$STR - mean(CASchools$STR)) * (CASchools$score - mean(CASchools$score))) / sum((CASchools$STR - mean(CASchools$STR))^2)
+
+# compute beta_0_hat
+beta_0 <- mean(score) - beta_1 * mean(STR)
+
+# print the results to the console
+beta_1
+
+
+## Compare to the linear model 
+# estimate the model and assign the result to linear_model
+linear_model <- lm(score ~ STR, data = CASchools)
+
+# print the standard output of the estimated lm object to the console 
+linear_model
+
+
+
+
+## Measures of goodness of fit 
+# compute R^2 manually
+SSR <- sum(mod_summary$residuals^2)
+TSS <- sum((score - mean(score))^2)
+R2 <- 1 - SSR/TSS
+
+# print the value to the console
+R2
+
+
+
+
+
+
+## Hypothesis testing 
+
+library(AER)
+library(scales)
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
