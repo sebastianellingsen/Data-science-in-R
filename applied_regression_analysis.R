@@ -244,8 +244,7 @@ legend("topleft",
 
 
 
-## Hypothesis testing 
-
+## Hypothesis testing
 # set seed
 set.seed(1)
 
@@ -254,4 +253,82 @@ sampledata <- rnorm(100, 10, 10)
 
 # check the type of the outcome produced by t.test
 t.test(sampledata)
+
+
+
+# set random seed
+set.seed(1)
+
+# draw data from two different populations with equal mean
+sample_pop1 <- rnorm(100, 10, 10)
+sample_pop2 <- rnorm(100, 10, 20)
+
+# perform a two sample t-test
+t.test(sample_pop1, sample_pop2)
+
+
+
+
+## Calculating correlations, add this here 
+library(MASS)
+
+# set random seed
+set.seed(1)
+
+# positive correlation (0.81)
+example1 <- mvrnorm(100,
+                    mu = c(0, 0), 
+                    Sigma = matrix(c(2, 2, 2, 3), ncol = 2),
+                    empirical = TRUE)
+
+# negative correlation (-0.81)
+example2 <- mvrnorm(100,
+                    mu = c(0, 0), 
+                    Sigma = matrix(c(2, -2, -2, 3), ncol = 2),
+                    empirical = TRUE)
+
+# no correlation 
+example3 <- mvrnorm(100,
+                    mu = c(0, 0), 
+                    Sigma = matrix(c(1, 0, 0, 1), ncol = 2),
+                    empirical = TRUE)
+
+# no correlation (quadratic relationship)
+X <- seq(-3, 3, 0.01)
+Y <- - X^2 + rnorm(length(X))
+
+example4 <- cbind(X, Y)
+
+# divide plot area as 2-by-2 array
+par(mfrow = c(2, 2))
+
+# plot datasets
+plot(example1, col = 'steelblue', pch = 20, xlab = 'X', ylab = 'Y', 
+     main = "Correlation = 0.81")
+
+plot(example2, col = 'steelblue', pch = 20, xlab = 'X', ylab = 'Y', 
+     main = "Correlation = -0.81")
+
+plot(example3, col = 'steelblue', pch = 20, xlab = 'X', ylab = 'Y', 
+     main = "Correlation = 0")
+
+plot(example4, col = 'steelblue', pch = 20, xlab = 'X', ylab = 'Y', 
+     main = "Correlation = 0")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
