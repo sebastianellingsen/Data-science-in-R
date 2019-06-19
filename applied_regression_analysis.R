@@ -381,13 +381,42 @@ library(scales)
 
 
 
-
-
-
-
 ## Regularization methods using glmnet
 
+# glmnet estimates generalized linear models and can include different 
+# regularization methods.
 
+library(glmnet)
+
+CASchools1 <- CASchools
+
+# The variables should be standardized before estimating the model 
+# glmnet standardizes by default
+CASchools1$teachers <- scale(CASchools$teachers)
+CASchools1$calworks <- scale(CASchools$calworks)
+CASchools1$lunch <- scale(CASchools$lunch)
+CASchools1$computer <- scale(CASchools$computer)
+CASchools1$expenditure <- scale(CASchools$expenditure)
+CASchools1$income <- scale(CASchools$income)
+CASchools1$english <- scale(CASchools$english)
+CASchools1$read <- scale(CASchools$read)
+CASchools1$math <- scale(CASchools$math)
+
+
+# Default for glmnet is a=1, hence lasso
+y <- CASchools[,5]
+x <- as.matrix(CASchools[,6:14])
+
+fit = glmnet(x, y, standardize = F)
+
+# s here denotes the lambda and the command returns the parameters
+coef(fit, s=5)
+
+cvfit = cv.glmnet(x, y)
+
+cvfit$lambda.min
+
+coef(cvfit, s = "lambda.min")
 
 
 
