@@ -1,1 +1,1 @@
-## Introduction slides to basic tools in econometrics using R.
+Introduction slides to basic tools in econometrics using R.
