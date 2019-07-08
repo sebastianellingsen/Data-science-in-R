@@ -1,1 +1,1 @@
-# text-analysis-in-R
+# Introduction slides to basic tools in econometrics using R.
